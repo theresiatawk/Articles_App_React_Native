@@ -15,15 +15,23 @@ export const login = (username, password) => {
           })
         }
       );
-      console.log(username);
-      console.log(password);
-  
+
+      let messageAlert = "Something went wrong!";
       if (!response.ok) {
-        throw new Error('Something went wrong!');
+        const errorResData = await response.json();
+        console.log(errorResData);
+        if (errorResData.message === "Cannot POST /auth/signinn"){
+            messageAlert = "Something went wrong!!"
+        }
+        if (errorResData.message === "Please check your login credentials"){
+            messageAlert = "Please check your login credentials";
+        }
+        throw new Error(messageAlert);
       }
+      messageAlert = "Something went wrong!";
   
       const resData = await response.json();
       console.log(resData);
-      dispatch({ type: LOGIN });
+      dispatch({ type: LOGIN, token: resData.accessToken});
     };
   };

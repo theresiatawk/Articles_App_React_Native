@@ -1,9 +1,11 @@
-import React, { useReducer, useCallback } from "react";
+import React, { useReducer, useCallback, useState, useEffect } from "react";
 import {
   StyleSheet,
   ScrollView,
   KeyboardAvoidingView,
   Button,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useDispatch } from "react-redux";
@@ -39,6 +41,8 @@ const formReducer = (state, action) => {
 };
 
 const AuthScreen = (props) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState();
   const dispatch = useDispatch();
 
   const [formState, dispatchFormState] = useReducer(formReducer, {
@@ -53,8 +57,26 @@ const AuthScreen = (props) => {
     formIsValid: false,
   });
 
-  const loginHandler = () => {
-    dispatch(authActions.login(formState.inputValues.username, formState.inputValues.password));
+  useEffect(() => {
+    if (error) {
+      Alert.alert("An Error Occured!", error, [{ text: "Okay" }]);
+    }
+  }, [error]);
+  const loginHandler = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await dispatch(
+        authActions.login(
+          formState.inputValues.username,
+          formState.inputValues.password
+        )
+      );
+      props.navigation.navigate('Articles');
+    } catch (error) {
+      setError(error.message);
+      setIsLoading(false);
+    }
   };
 
   const inputChangeHandler = useCallback(
@@ -92,13 +114,20 @@ const AuthScreen = (props) => {
               KeyboardType="default"
               secureTextEntry
               required
-              minLength={5}
               autoCapitalize="none"
               errorText="Please enter a valid password."
               onInputChange={inputChangeHandler}
               initialVlaue=""
             />
-            <Button title="login" color={Colors.primary} onPress={loginHandler} />
+            {isLoading ? (
+              <ActivityIndicator size="small" color={Colors.primary} />
+            ) : (
+              <Button
+                title="Login"
+                color={Colors.primary}
+                onPress={loginHandler}
+              />
+            )}
           </ScrollView>
         </Card>
       </LinearGradient>

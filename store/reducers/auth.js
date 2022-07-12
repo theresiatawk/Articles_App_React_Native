@@ -1,9 +1,18 @@
+import { LOGIN } from "../actions/auth";
+
 const initialState = {
-    auth: []
-}
+  token: null
+};
 
 const authReducer = (state = initialState, action) => {
-    return state;
+  switch (action.type) {
+    case LOGIN:
+      return { 
+        token: action.token, 
+    };
+    default:
+      return state;
+  }
 };
 
 export default authReducer;
