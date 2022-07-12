@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useReducer, useCallback } from "react";
 import {
   StyleSheet,
   ScrollView,
@@ -6,29 +6,84 @@ import {
   Button,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { useDispatch } from "react-redux";
+
 import Card from "../../components/Card";
 import Input from "../../components/Input";
 import Colors from "../../constants/Colors";
+import * as authActions from "../../store/actions/auth";
+
+const FORM_INPUT_UPDATE = "FORM_INPUT_UPDATE";
+
+const formReducer = (state, action) => {
+  if (action.type === FORM_INPUT_UPDATE) {
+    const updatedValues = {
+      ...state.inputValues,
+      [action.input]: action.value,
+    };
+    const updatedValidities = {
+      ...state.inputValidities,
+      [action.input]: action.isValid,
+    };
+    let updatedFormIsValid = true;
+    for (const key in updatedValidities) {
+      updatedFormIsValid = updatedFormIsValid && updatedValidities[key];
+    }
+    return {
+      formIsValid: updatedFormIsValid,
+      inputValidities: updatedValidities,
+      inputValues: updatedValues,
+    };
+  }
+  return state;
+};
 
 const AuthScreen = (props) => {
+  const dispatch = useDispatch();
+
+  const [formState, dispatchFormState] = useReducer(formReducer, {
+    inputValues: {
+      username: "",
+      password: "",
+    },
+    inputValidities: {
+      username: false,
+      password: false,
+    },
+    formIsValid: false,
+  });
+
+  const loginHandler = () => {
+    dispatch(authActions.login(formState.inputValues.username, formState.inputValues.password));
+  };
+
+  const inputChangeHandler = useCallback(
+    (inputIdentifier, inputValue, inputValidity) => {
+      dispatchFormState({
+        type: FORM_INPUT_UPDATE,
+        value: inputValue,
+        isValid: inputValidity,
+        input: inputIdentifier,
+      });
+    },
+    [dispatchFormState]
+  );
   return (
     <KeyboardAvoidingView
       behavior="padding"
-      keyboardVerticalOffset={50}
+      keyboardVerticalOffset={10}
       style={styles.screen}
     >
       <LinearGradient colors={["#ffedff", "#ffe3ff"]} style={styles.gradient}>
         <Card style={styles.authContainer}>
           <ScrollView>
             <Input
-              id="email"
-              label="E-Mail"
-              KeyboardType="email-address"
+              id="username"
+              label="Username"
               required
-              email
               autoCapitalize="none"
-              errorMessage="Please enter a valid email adress."
-              onInputChange={() => {}}
+              errorText="Please enter a valid username."
+              onInputChange={inputChangeHandler}
               initialVlaue=""
             />
             <Input
@@ -39,11 +94,11 @@ const AuthScreen = (props) => {
               required
               minLength={5}
               autoCapitalize="none"
-              errorMessage="Please enter a valid password."
-              onInputChange={() => {}}
+              errorText="Please enter a valid password."
+              onInputChange={inputChangeHandler}
               initialVlaue=""
             />
-            <Button title="login" color={Colors.primary} onPress={() => {}} />
+            <Button title="login" color={Colors.primary} onPress={loginHandler} />
           </ScrollView>
         </Card>
       </LinearGradient>
