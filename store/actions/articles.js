@@ -18,14 +18,17 @@ export const fetchArticles = page => {
         console.log(resData);
         throw new Error("Something went wrong!");
       }
-
       const resData = await response.json();
       const loadedArticles = [];
-      console.log("After loadedArtticles");
       for (const key in resData.response.docs) {
             loadedArticles.push({
             id: resData.response.docs[key]._id, 
-            abstract: resData.response.docs[key].abstract 
+            section: resData.response.docs[key].section_name,
+            abstract: resData.response.docs[key].abstract, 
+            publisher: resData.response.docs[key].original,
+            source: resData.response.docs[key].source,
+            paragraph: resData.response.docs[key].lead_paragraph,
+            imageUrl:resData.response.docs[key].multimedia[0] ? `https://static01.nyt.com/${resData.response.docs[key].multimedia[0].url}` : '',
         }
         ); 
       }

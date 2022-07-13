@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   FlatList,
   Button,
+  Image,
   TouchableOpacity,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
@@ -89,9 +90,18 @@ const ArticlesScreen = (props) => {
       keyExtractor={(item) => item.id}
       renderItem={(itemData) => (
         <Card style={styles.article}>
+            {itemData.item.imageUrl !== '' && <View style={styles.imageContainer}>
+              <Image style={styles.image} source={{ uri: itemData.item.imageUrl }} />
+            </View>
+          }
           <View style={styles.details}>
-            <Text style={styles.title}>Hello</Text>
-            <Text style={styles.abstract}>{itemData.item.abstract}</Text>
+            <Text style={styles.section}>{itemData.item.section ? itemData.item.section : "General"}</Text>
+            <Text style={styles.abstract} numberOfLines = {18}><Text style = {styles.bold}>Abstract: </Text>{itemData.item.abstract}</Text>
+            {/* <Text style={styles.abstract}><Text style = {styles.bold}>Paragraph: </Text>{itemData.item.paragraph}</Text> */}
+          </View>
+          <View style={styles.generalDetails}>
+            <Text><Text style = {styles.bold}>Publisher: </Text>{itemData.item.publisher}</Text>
+            <Text><Text style = {styles.bold}>Source: </Text>{itemData.item.source}</Text>
           </View>
         </Card>
       )}
@@ -128,16 +138,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   article: {
-    height: 300,
+    flex: 1,
+    height: 400,
     margin: 20,
-  },
-  touchable: {
-    borderRadius: 10,
-    overflow: "hidden",
   },
   imageContainer: {
     width: "100%",
-    height: "60%",
+    height: "50%",
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     overflow: "hidden",
@@ -145,26 +152,34 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: "100%",
+    overflow:'hidden'
   },
   details: {
     alignItems: "center",
-    height: "17%",
+    height: "40%",
     padding: 10,
   },
-  title: {
+  section: {
     fontSize: 18,
     marginVertical: 2,
+    color: Colors.primary
   },
+  bold: {
+    fontSize: 15,
+    color: 'black'
+  }, 
   abstract: {
-    fontSize: 14,
+    flexWrap: 'wrap',
+    fontSize: 12,
     color: "#888",
+    height: "30%", 
+    margin: 15
   },
-  actions: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    height: "23%",
-    paddingHorizontal: 20,
+  generalDetails: {
+    fontSize: 12,
+    color: "black",
+    height: "50%", 
+    margin: 15
   },
   loader: {
     marginTop: 20, 
