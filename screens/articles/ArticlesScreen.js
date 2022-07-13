@@ -105,11 +105,18 @@ const ArticlesScreen = (props) => {
       }}
       onEndReached = {() => {
         if(currentPage === 0){
-          setIsLoading(true);
+          setIsRefreshing(true);
           setCurrentPage(1);
         }
       }}
       onEndReachedThreshold={0.5}
+      onRefresh={() => {
+        if(currentPage === 1){
+          setIsRefreshing(true);
+          setCurrentPage(0);
+        }
+      }}
+      refreshing={isLoading}
     />
     </View>
   );
