@@ -1,4 +1,11 @@
+import { AsyncStorage } from "react-native";
 export const LOGIN = 'LOGIN';
+export const AUTHENTICATE = 'AUTHENTICATE';
+export const LOGOUT = 'LOGOUT';
+
+export const authenticate = (token) => {
+  return {type: AUTHENTICATE, token: token}
+}
 
 export const login = (username, password) => {
     return async dispatch => {
@@ -33,5 +40,19 @@ export const login = (username, password) => {
       const resData = await response.json();
       console.log(resData);
       dispatch({ type: LOGIN, token: resData.accessToken});
+      saveDataToStorage(resData.accessToken)
     };
+  };
+
+  export const logout = () => {
+    return {type: LOGOUT}
+  };
+
+  const saveDataToStorage = (token) => {
+    AsyncStorage.setItem(
+      'userData',
+      JSON.stringify({
+        token: token
+    })
+    );
   };
