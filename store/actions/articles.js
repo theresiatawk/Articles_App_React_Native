@@ -1,18 +1,24 @@
 export const SET_ARTICLES = "SET_ARTICLES";
+export const SEARCH_ARTICLES = "SEARCH_ARTICLES";
+export const FETCH_SPECIFIC_ARTICLES = "FETCH_SPECIFIC_ARTICLES";
 
-export const fetchArticles = page => {
+export const searchArticles = (text) => {
+  return { type: SEARCH_ARTICLES, payload: text };
+};
+export const fetchArticles = (page, text)=> {
   return async (dispatch, getState) => {
       const token = getState().users.token;
+      console.log(token);
       const response = await fetch(
         "http://34.245.213.76:3000/articles?&page="+page,
         {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNhbmRpZGF0ZSIsImlhdCI6MTY1NzY5MTI3OSwiZXhwIjoxNjU3NzI3Mjc5fQ.w6T4PEKYXRUiZDKPWABB6hKtPadh6Nx9ZUG8xHW6aPc" ,
+            "Authorization": "Bearer "+token,
           },
         }
-      );
+      ); 
       if (!response.ok) {
         const resData = await response.json(); 
         console.log(resData);
@@ -33,6 +39,44 @@ export const fetchArticles = page => {
         ); 
       }
       console.log(loadedArticles);
-      dispatch({ type: SET_ARTICLES, articles: loadedArticles});
-  };
-}; 
+      if (text === ""){
+        dispatch({ type: SET_ARTICLES, articles: loadedArticles, fetchedArticles: loadedArticles});
+      }
+      else{
+        const newData =[];
+        dispatch({ type: SET_ARTICLES, articles: loadedArticles, fetchedArticles: loadedArticles});
+        loadedArticles.filter((item) => {
+            let constant = "";
+            if ((item.abstract.toLowerCase().includes(text.toLowerCase()))){
+                newData.push(item);
+              }
+            });
+        console.log("----------------------New Data----------------------------");
+        console.log(newData);
+        dispatch({ type: SET_ARTICLES, articles: newData, fetchedArticles: newData});
+      }
+    }
+};
+  export const fetchSpecificArticles = (text) => {
+    return async (dispatch, getState) => {
+      const allArticles = getState().articles.availableArticles;
+      if (text){
+        const newData =[];
+        allArticles.filter((item) => {
+          if(text === ""){
+            newData.push(item);
+          }else if (item.abstract.toLowerCase().includes(text.toLowerCase()) ||
+          item.section.toLowerCase().includes(text.toLowerCase())){
+            newData.push(item);
+          }
+        });
+        console.log("----------------------New Data----------------------------");
+        console.log(newData);
+        dispatch({ type: FETCH_SPECIFIC_ARTICLES, fetchedArticles: newData, text: text});
+      }
+      else{
+        dispatch({ type: FETCH_SPECIFIC_ARTICLES, fetchedArticles: allArticles, text: text});
+      }
+      
+    };
+}

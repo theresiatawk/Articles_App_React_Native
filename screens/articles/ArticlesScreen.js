@@ -8,6 +8,8 @@ import {
   Button,
   Image,
   TouchableOpacity,
+  TextInput,
+  Dimensions,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import * as articleActions from "../../store/actions/articles";
@@ -15,32 +17,35 @@ import Colors from "../../constants/Colors";
 import Card from "../../components/Card";
 import ArticleView from "../../components/ArticleView";
 import * as authActions from '../../store/actions/auth';
+import { FontAwesome } from '@expo/vector-icons';
 
 const ArticlesScreen = (props) => {
+  const [data, setData] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState();
   const [currentPage, setCurrentPage] = useState(0);
+ 
   const articles = useSelector((state) => state.articles.availableArticles);
-  const dispatch = useDispatch();
+  const searchText = useSelector((state) => state.articles.searchedText);
 
+  const dispatch = useDispatch();
   const loadArticles = useCallback(async () => {
     setError(null);
     setIsRefreshing(true);
     try { 
-      await dispatch(articleActions.fetchArticles(currentPage));
+      await dispatch(articleActions.fetchArticles(currentPage, searchText));
     } catch (error) {
       setError(error.message);
     }  
     setIsRefreshing(false); 
     }, [dispatch, setIsLoading, setError, currentPage]);
-
+    
   useEffect(() => {
     const willFocusSub = props.navigation.addListener(
       "willFocus",
       loadArticles
     );
-
     return () => {
       willFocusSub.remove();
     };
@@ -67,14 +72,6 @@ const ArticlesScreen = (props) => {
       </View>
     );
   }
-
-  if (!isLoading && articles.length === 0) {
-    return (
-      <View style={styles.centered}>
-        <Text>No Articles found.</Text>
-      </View>
-    );
-  }
   return (
     <View style={{ flex: 1}}>
       <Button
@@ -85,7 +82,27 @@ const ArticlesScreen = (props) => {
         props.navigation.navigate('Authentication');
         }}
       />
-    <FlatList
+      <View style={styles.searchBarContainer}>
+        <TextInput 
+          style = {styles.textInputSearch} 
+          placeholder="Search..." 
+          onChangeText={event => {
+            dispatch(articleActions.searchArticles(event));
+            //dispatch(articleActions.fetchSpecificArticles(searchText));
+            }}></TextInput>
+        <TouchableOpacity
+          style = {styles.textSearchButton}
+          onPress={() => {
+            dispatch(articleActions.fetchArticles(currentPage, searchText));
+          }}
+        >
+        <FontAwesome 
+        name="search" 
+        size={16} color="#888" 
+        />
+        </TouchableOpacity>
+      </View>
+    {articles.length !== 0 ? <FlatList
       data={articles}
       keyExtractor={(item) => item.id}
       renderItem={(itemData) => (
@@ -127,9 +144,12 @@ const ArticlesScreen = (props) => {
         }
       }}
       refreshing={isLoading}
-    />
+    /> : <View style={styles.centered}>
+    <Text>No Articles found.</Text>
+  </View>}
     </View>
   );
+  
 };
 const styles = StyleSheet.create({
   screen: {
@@ -137,6 +157,36 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  searchBarContainer: {
+    width: Dimensions.get('window').width - 30,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    height: 50,
+    borderBottomWidth: 2,
+    marginVertical: 10,
+    borderColor: 'lightgray',
+    margin: 20
+  },
+  textInputSearch: {
+    flex: 8,
+    borderColor: 'lightgray',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginRight: 10,
+    height: 40,
+    paddingLeft: 10
+  },
+  textSearchButton: {
+    flex: 1,
+    backgroundColor: 'lightgray',
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    height: 40
+  },
+
   article: {
     flex: 1,
     height: 400,

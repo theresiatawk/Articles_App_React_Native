@@ -38,11 +38,13 @@ export const login = (username, password) => {
       messageAlert = "Something went wrong!";
   
       const resData = await response.json();
-      console.log(resData);
-      dispatch({ type: LOGIN, token: resData.accessToken});
-      saveDataToStorage(resData.accessToken)
+      //console.log(resData);
+      //dispatch({ type: LOGIN, token: resData.accessToken});
+      dispatch(authenticate(resData.accessToken));
+      saveDataToStorage(resData.accessToken);
+      
     };
-  };
+  }; 
 
   export const logout = () => {
     return {type: LOGOUT}

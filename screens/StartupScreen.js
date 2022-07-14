@@ -20,18 +20,21 @@ const StartupScreen = props => {
         props.navigation.navigate('Authentication');
         return;
       }
+      else{
       const transformedData = JSON.parse(userData);
-      const {token} = transformedData;
+      const { token } = transformedData;
+      //console.log(userData);
       props.navigation.navigate('Articles');
       dispatch(authActions.authenticate(token));
+      }
     };
-    tryLogin();
+    tryLogin(); 
   }, [dispatch]);
 
   return(
     <View style={styles.screen}>
       <ActivityIndicator size="large" color={Colors.primary} />
-    </View>
+    </View> 
     );
 };
 const styles = StyleSheet.create({
