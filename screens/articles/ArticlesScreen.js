@@ -15,9 +15,10 @@ import { useDispatch, useSelector } from "react-redux";
 import * as articleActions from "../../store/actions/articles";
 import Colors from "../../constants/Colors";
 import Card from "../../components/Card";
-import ArticleView from "../../components/ArticleView";
 import * as authActions from '../../store/actions/auth';
 import { FontAwesome } from '@expo/vector-icons';
+import { HeaderButtons, Item } from "react-navigation-header-buttons";
+import CustomHeaderButton from "../../components/CustomHeaderButton";
 
 const ArticlesScreen = (props) => {
   const [data, setData] = useState(false);
@@ -30,6 +31,7 @@ const ArticlesScreen = (props) => {
   const searchText = useSelector((state) => state.articles.searchedText);
 
   const dispatch = useDispatch();
+  const logout = () => {};
   const loadArticles = useCallback(async () => {
     setError(null);
     setIsRefreshing(true);
@@ -73,22 +75,15 @@ const ArticlesScreen = (props) => {
     );
   }
   return (
-    <View style={{ flex: 1}}>
-      <Button
-        title="Logout"
-        color={Colors.primary}
-        onPress={() => {
-        dispatch(authActions.logout());
-        props.navigation.navigate('Authentication');
-        }}
-      />
+    <View style={styles.pageContainer}>
+      <Text style = {styles.page}>Page {currentPage + 1}</Text>
       <View style={styles.searchBarContainer}>
         <TextInput 
           style = {styles.textInputSearch} 
           placeholder="Search..." 
           onChangeText={event => {
             dispatch(articleActions.searchArticles(event));
-            //dispatch(articleActions.fetchSpecificArticles(searchText));
+            dispatch(articleActions.fetchSpecificArticles(searchText));
             }}></TextInput>
         <TouchableOpacity
           style = {styles.textSearchButton}
@@ -102,6 +97,7 @@ const ArticlesScreen = (props) => {
         />
         </TouchableOpacity>
       </View>
+    {}
     {articles.length !== 0 ? <FlatList
       data={articles}
       keyExtractor={(item) => item.id}
@@ -114,12 +110,11 @@ const ArticlesScreen = (props) => {
           <View style={styles.details}>
             <Text style={styles.section}>{itemData.item.section ? itemData.item.section : "General"}</Text>
             <Text style={styles.abstract} numberOfLines = {18}><Text style = {styles.bold}>Abstract: </Text>{itemData.item.abstract}</Text>
-            {/* <Text style={styles.abstract}><Text style = {styles.bold}>Paragraph: </Text>{itemData.item.paragraph}</Text> */}
           </View>
-          <View style={styles.generalDetails}>
-            <Text><Text style = {styles.bold}>Publisher: </Text>{itemData.item.publisher}</Text>
-            <Text><Text style = {styles.bold}>Source: </Text>{itemData.item.source}</Text>
-          </View>
+          <View style={styles.additionalDetails}>
+              <Text style = {styles.abstract}><Text style = {styles.bold}> Publisher: </Text>{itemData.item.publisher}</Text>
+              <Text style = {styles.abstract}><Text style = {styles.bold}>Source: </Text>{itemData.item.source}</Text>
+            </View>
         </Card>
       )}
       ListFooterComponent={() => {
@@ -151,7 +146,36 @@ const ArticlesScreen = (props) => {
   );
   
 };
+
+ArticlesScreen.navigationOptions = (navData) => {
+  return {
+    headerRight: props => {
+      const dispatch = useDispatch();
+    return (<HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+        <Item title = 'Logout'
+        iconName = 'logout'
+        onPress={() => {
+        dispatch(authActions.logout());
+        navData.navigation.navigate('Authentication');
+        }}/>
+    </HeaderButtons>);
+    }
+  }
+}
 const styles = StyleSheet.create({
+  centered: {
+    flex: 1,
+    alignItems: "center", 
+    justifyContent: "center",
+  },
+  pageContainer: {
+    alignItems: "center",
+    paddingTop: 5,
+  },
+  page: {
+    fontSize: 14,
+    color: Colors.primary
+  },
   screen: {
     flex: 1,
     alignItems: "center",
@@ -189,14 +213,15 @@ const styles = StyleSheet.create({
 
   article: {
     flex: 1,
-    height: 400,
+    height: 550,
     margin: 20,
   },
   imageContainer: {
     width: "100%",
-    height: "50%",
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
+    height: "40%",
+    borderRadius: 1000,
+    // borderTopLeftRadius: 10,
+    // borderTopRightRadius: 10,
     overflow: "hidden",
   },
   image: {
@@ -206,8 +231,14 @@ const styles = StyleSheet.create({
   },
   details: {
     alignItems: "center",
-    height: "40%",
+    height: "60%",
     padding: 10,
+  },
+  additionalDetails: {
+    alignItems: "flex-start",
+    justifyContent: "flex-end",
+    height: "40%",
+    padding:5
   },
   section: {
     fontSize: 18,
@@ -219,17 +250,9 @@ const styles = StyleSheet.create({
     color: 'black'
   }, 
   abstract: {
-    flexWrap: 'wrap',
     fontSize: 12,
     color: "#888",
     height: "30%", 
-    margin: 15
-  },
-  generalDetails: {
-    fontSize: 12,
-    color: "black",
-    height: "50%", 
-    margin: 15
   },
   loader: {
     marginTop: 20, 

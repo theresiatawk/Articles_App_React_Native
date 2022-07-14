@@ -31,7 +31,7 @@ export const fetchArticles = (page, text)=> {
             id: resData.response.docs[key]._id, 
             section: resData.response.docs[key].section_name,
             abstract: resData.response.docs[key].abstract, 
-            publisher: resData.response.docs[key].original,
+            publisher: resData.response.docs[key].byline.original,
             source: resData.response.docs[key].source,
             paragraph: resData.response.docs[key].lead_paragraph,
             imageUrl:resData.response.docs[key].multimedia[0] ? `https://static01.nyt.com/${resData.response.docs[key].multimedia[0].url}` : '',
@@ -46,7 +46,6 @@ export const fetchArticles = (page, text)=> {
         const newData =[];
         dispatch({ type: SET_ARTICLES, articles: loadedArticles, fetchedArticles: loadedArticles});
         loadedArticles.filter((item) => {
-            let constant = "";
             if ((item.abstract.toLowerCase().includes(text.toLowerCase()))){
                 newData.push(item);
               }
@@ -57,26 +56,3 @@ export const fetchArticles = (page, text)=> {
       }
     }
 };
-  export const fetchSpecificArticles = (text) => {
-    return async (dispatch, getState) => {
-      const allArticles = getState().articles.availableArticles;
-      if (text){
-        const newData =[];
-        allArticles.filter((item) => {
-          if(text === ""){
-            newData.push(item);
-          }else if (item.abstract.toLowerCase().includes(text.toLowerCase()) ||
-          item.section.toLowerCase().includes(text.toLowerCase())){
-            newData.push(item);
-          }
-        });
-        console.log("----------------------New Data----------------------------");
-        console.log(newData);
-        dispatch({ type: FETCH_SPECIFIC_ARTICLES, fetchedArticles: newData, text: text});
-      }
-      else{
-        dispatch({ type: FETCH_SPECIFIC_ARTICLES, fetchedArticles: allArticles, text: text});
-      }
-      
-    };
-}

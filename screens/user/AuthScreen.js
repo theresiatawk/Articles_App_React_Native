@@ -6,6 +6,8 @@ import {
   Button,
   ActivityIndicator,
   Alert,
+  Text, 
+  View
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useDispatch } from "react-redux";
@@ -92,17 +94,20 @@ const AuthScreen = (props) => {
   );
   return (
     <KeyboardAvoidingView
-      behavior="padding"
+      behavior="padding" 
       keyboardVerticalOffset={10}
       style={styles.screen}
     >
       <LinearGradient colors={["#ffedff", "#ffe3ff"]} style={styles.gradient}>
         <Card style={styles.authContainer}>
           <ScrollView>
+            <View style = {styles.welcomeContainer}>
+            <Text style = {styles.welcome}>WELCOME</Text>
+            </View>
             <Input
               id="username"
               label="Username"
-              required
+              required  
               autoCapitalize="none"
               errorText="Please enter a valid username."
               onInputChange={inputChangeHandler}
@@ -147,6 +152,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  welcomeContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 10,
+  },
+  welcome: {
+    fontSize: 20,
+    color: Colors.primary,
   },
   authContainer: {
     width: "80%",

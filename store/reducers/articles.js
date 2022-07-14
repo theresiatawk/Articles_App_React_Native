@@ -20,11 +20,6 @@ export default (state = initialState, action) => {
           ...state,
           searchedText: action.payload,
         };
-        case FETCH_SPECIFIC_ARTICLES:
-        return {
-          ...state,
-          filterArticles: action.fetchedArticles,
-        };
         default:
           return state;
     }

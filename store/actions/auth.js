@@ -39,7 +39,6 @@ export const login = (username, password) => {
   
       const resData = await response.json();
       //console.log(resData);
-      //dispatch({ type: LOGIN, token: resData.accessToken});
       dispatch(authenticate(resData.accessToken));
       saveDataToStorage(resData.accessToken);
       
@@ -47,6 +46,7 @@ export const login = (username, password) => {
   }; 
 
   export const logout = () => {
+    AsyncStorage.removeItem('userData');
     return {type: LOGOUT}
   };
 
