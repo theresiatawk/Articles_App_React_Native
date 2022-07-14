@@ -83,8 +83,7 @@ const ArticlesScreen = (props) => {
           placeholder="Search..." 
           onChangeText={event => {
             dispatch(articleActions.searchArticles(event));
-            dispatch(articleActions.fetchSpecificArticles(searchText));
-            }}></TextInput>
+          }}></TextInput>
         <TouchableOpacity
           style = {styles.textSearchButton}
           onPress={() => {
@@ -97,24 +96,28 @@ const ArticlesScreen = (props) => {
         />
         </TouchableOpacity>
       </View>
-    {}
+    
     {articles.length !== 0 ? <FlatList
       data={articles}
       keyExtractor={(item) => item.id}
       renderItem={(itemData) => (
         <Card style={styles.article}>
-            {itemData.item.imageUrl !== '' && <View style={styles.imageContainer}>
+            {/* {itemData.item.imageUrl !== '' && <View><View style={styles.imageContainer}>
               <Image style={styles.image} source={{ uri: itemData.item.imageUrl }} />
             </View>
-          }
+            <View style={styles.details}>
+            <Text style={styles.section}>{itemData.item.section ? itemData.item.section : "General"}</Text>
+            <Text style={styles.abstract} numberOfLines = {5}><Text style = {styles.bold}>Abstract: </Text>{itemData.item.abstract  ? itemData.item.abstract : "No abstract"}</Text>
+            <Text style = {styles.abstract}><Text style = {styles.bold}> Publisher: </Text>{itemData.item.publisher ? itemData.item.publisher : "Undefined"}</Text>
+            <Text style = {styles.abstract}><Text style = {styles.bold}>Source: </Text>{itemData.item.source}</Text>
+          </View></View>
+          } */}
           <View style={styles.details}>
             <Text style={styles.section}>{itemData.item.section ? itemData.item.section : "General"}</Text>
-            <Text style={styles.abstract} numberOfLines = {18}><Text style = {styles.bold}>Abstract: </Text>{itemData.item.abstract}</Text>
+            <Text style={styles.abstract} numberOfLines = {5}><Text style = {styles.bold}>Abstract: </Text>{itemData.item.abstract  ? itemData.item.abstract : "No abstract"}</Text>
+            <Text style = {styles.abstract}><Text style = {styles.bold}> Publisher: </Text>{itemData.item.publisher ? itemData.item.publisher : "Undefined"}</Text>
+            <Text style = {styles.abstract}><Text style = {styles.bold}>Source: </Text>{itemData.item.source}</Text>
           </View>
-          <View style={styles.additionalDetails}>
-              <Text style = {styles.abstract}><Text style = {styles.bold}> Publisher: </Text>{itemData.item.publisher}</Text>
-              <Text style = {styles.abstract}><Text style = {styles.bold}>Source: </Text>{itemData.item.source}</Text>
-            </View>
         </Card>
       )}
       ListFooterComponent={() => {
@@ -139,9 +142,9 @@ const ArticlesScreen = (props) => {
         }
       }}
       refreshing={isLoading}
-    /> : <View style={styles.centered}>
-    <Text>No Articles found.</Text>
-  </View>}
+      /> : <View>
+      <Text>No Articles found.</Text>
+    </View>}
     </View>
   );
   
@@ -210,18 +213,16 @@ const styles = StyleSheet.create({
     padding: 10,
     height: 40
   },
-
   article: {
     flex: 1,
-    height: 550,
+    height: 300,
     margin: 20,
   },
   imageContainer: {
     width: "100%",
     height: "40%",
-    borderRadius: 1000,
-    // borderTopLeftRadius: 10,
-    // borderTopRightRadius: 10,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
     overflow: "hidden",
   },
   image: {
@@ -231,28 +232,25 @@ const styles = StyleSheet.create({
   },
   details: {
     alignItems: "center",
+    justifyContent: "flex-start",
     height: "60%",
-    padding: 10,
-  },
-  additionalDetails: {
-    alignItems: "flex-start",
-    justifyContent: "flex-end",
-    height: "40%",
-    padding:5
+    padding: 5,
   },
   section: {
     fontSize: 18,
-    marginVertical: 2,
+    marginVertical: 10,
     color: Colors.primary
   },
   bold: {
     fontSize: 15,
-    color: 'black'
+    color: 'black', 
+    alignItems: "center",
   }, 
   abstract: {
     fontSize: 12,
     color: "#888",
     height: "30%", 
+    margin: 10
   },
   loader: {
     marginTop: 20, 
